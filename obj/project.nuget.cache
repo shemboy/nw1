@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "s0/dFCMRUsw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\shemd\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.2\\microsoft.aspnetcore.app.internal.assets.10.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
