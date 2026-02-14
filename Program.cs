@@ -1,10 +1,13 @@
-using nw1.Components;
+using BSIT2B.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Register HttpClient service
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

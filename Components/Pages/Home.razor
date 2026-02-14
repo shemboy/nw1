@@ -1,7 +1,47 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Valentine's Day</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="valentines-container">
+    <h1 class="title">Happy Valentine's Day! 💝</h1>
+    
+    <div class="hearts-container">
+        <span class="heart-emoji">❤️</span>
+        <span class="heart-emoji">❤️</span>
+        <span class="heart-emoji">❤️</span>
+        <span class="heart-emoji">❤️</span>
+        <span class="heart-emoji">❤️</span>
+    </div>
 
-Welcome to your new app.
+    <div class="content-box">
+        <p class="message">Love makes the world go round... 🌍</p>
+        <p class="submessage">Spread love, kindness, and joy this Valentine's Day!</p>
+    </div>
+
+    <div class="floating-hearts">
+        <span class="float-heart">❤️</span>
+        <span class="float-heart">💕</span>
+        <span class="float-heart">💖</span>
+        <span class="float-heart">💗</span>
+        <span class="float-heart">💘</span>
+    </div>
+
+    <button class="love-button" @onclick="ShowLoveMessage">Click Me! 💌</button>
+
+    @if (showMessage)
+    {
+        <div class="love-message">
+            <p class="animate-text">You are loved and appreciated! 🎀</p>
+        </div>
+    }
+</div>
+
+@code {
+    private bool showMessage = false;
+
+    private void ShowLoveMessage()
+    {
+        showMessage = !showMessage;
+    }
+}

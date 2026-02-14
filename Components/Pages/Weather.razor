@@ -1,64 +1,182 @@
 ﻿@page "/weather"
-@attribute [StreamRendering]
+@using System.Net.Http.Json
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject HttpClient HttpClient
 
 <PageTitle>Weather</PageTitle>
 
-<h1>Weather</h1>
+<div class="weather-container">
+    <h1 class="weather-title">🌤️ Weather Forecast</h1>
+    <p class="weather-location">📍 Daanbantayan, Cebu, Philippines</p>
 
-<p>This component demonstrates showing data.</p>
+    <p class="weather-subtitle">5-Day Weather Forecast</p>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th aria-label="Temperature in Celsius">Temp. (C)</th>
-                <th aria-label="Temperature in Fahrenheit">Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (forecasts == null)
+    {
+        <div class="loading-spinner">
+            <p><em>Loading weather data...</em></p>
+            <div class="spinner"></div>
+        </div>
+    }
+    else if (errorMessage != null)
+    {
+        <div class="error-message">
+            <p>⚠️ Error: @errorMessage</p>
+            <p style="font-size: 0.9rem;">Using sample data...</p>
+        </div>
+        <div class="table-wrapper">
+            <table class="table weather-table">
+                <thead>
+                    <tr class="table-header-animated">
+                        <th>Date</th>
+                        <th>Max Temp (°C)</th>
+                        <th>Min Temp (°C)</th>
+                        <th>Precipitation</th>
+                        <th>Weather</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var forecast in GetSampleData())
+                    {
+                        <tr class="table-row-animated">
+                            <td>@forecast.Date</td>
+                            <td class="temp-cell">@forecast.MaxTemp.ToString("F1")</td>
+                            <td class="temp-cell">@forecast.MinTemp.ToString("F1")</td>
+                            <td>@forecast.Precipitation.ToString("F1") mm</td>
+                            <td class="summary-cell">@forecast.Weather</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrapper">
+            <table class="table weather-table">
+                <thead>
+                    <tr class="table-header-animated">
+                        <th>Date</th>
+                        <th>Max Temp (°C)</th>
+                        <th>Min Temp (°C)</th>
+                        <th>Precipitation</th>
+                        <th>Weather</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var forecast in forecasts)
+                    {
+                        <tr class="table-row-animated">
+                            <td>@forecast.Date</td>
+                            <td class="temp-cell">@forecast.MaxTemp.ToString("F1")</td>
+                            <td class="temp-cell">@forecast.MinTemp.ToString("F1")</td>
+                            <td>@forecast.Precipitation.ToString("F1") mm</td>
+                            <td class="summary-cell">@forecast.Weather</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<WeatherForecast>? forecasts;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        try
         {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+            // Daanbantayan, Cebu coordinates
+            var latitude = 11.0537;
+            var longitude = 123.8854;
+            
+            var url = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=Asia/Manila";
+            
+            var response = await HttpClient.GetAsync(url);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var jsonDocument = JsonDocument.Parse(content);
+                var root = jsonDocument.RootElement;
+                
+                forecasts = new List<WeatherForecast>();
+                
+                if (root.TryGetProperty("daily", out var dailyElement))
+                {
+                    var times = dailyElement.GetProperty("time").EnumerateArray().Take(5).Select(x => x.GetString()).ToList();
+                    var tempMax = dailyElement.GetProperty("temperature_2m_max").EnumerateArray().Take(5).Select(x => x.GetDouble()).ToList();
+                    var tempMin = dailyElement.GetProperty("temperature_2m_min").EnumerateArray().Take(5).Select(x => x.GetDouble()).ToList();
+                    var precip = dailyElement.GetProperty("precipitation_sum").EnumerateArray().Take(5).Select(x => x.GetDouble()).ToList();
+                    var weatherCodes = dailyElement.GetProperty("weather_code").EnumerateArray().Take(5).Select(x => x.GetInt32()).ToList();
+                    
+                    for (int i = 0; i < times.Count; i++)
+                    {
+                        forecasts.Add(new WeatherForecast
+                        {
+                            Date = times[i] ?? "N/A",
+                            MaxTemp = i < tempMax.Count ? tempMax[i] : 0,
+                            MinTemp = i < tempMin.Count ? tempMin[i] : 0,
+                            Precipitation = i < precip.Count ? precip[i] : 0,
+                            Weather = i < weatherCodes.Count ? GetWeatherDescription(weatherCodes[i]) : "Unknown"
+                        });
+                    }
+                }
+            }
+            else
+            {
+                errorMessage = $"API Error: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private string GetWeatherDescription(int code)
+    {
+        return code switch
+        {
+            0 => "🌞 Clear",
+            1 or 2 => "⛅ Partly Cloudy",
+            3 => "☁️ Overcast",
+            45 or 48 => "🌫️ Foggy",
+            51 or 53 or 55 => "🌧️ Drizzle",
+            61 or 63 or 65 => "🌧️ Rain",
+            71 or 73 or 75 => "❄️ Snow",
+            80 or 81 or 82 => "⛈️ Showers",
+            85 or 86 => "❄️ Snow Showers",
+            95 or 96 or 99 => "⛈️ Thunderstorm",
+            _ => "🌤️ Unknown"
+        };
+    }
+
+    private List<WeatherForecast> GetSampleData()
+    {
+        var today = DateTime.Now;
+        return new List<WeatherForecast>
+        {
+            new WeatherForecast { Date = today.ToShortDateString(), MaxTemp = 32, MinTemp = 25, Precipitation = 2.5, Weather = "🌞 Clear" },
+            new WeatherForecast { Date = today.AddDays(1).ToShortDateString(), MaxTemp = 31, MinTemp = 24, Precipitation = 5.0, Weather = "⛅ Partly Cloudy" },
+            new WeatherForecast { Date = today.AddDays(2).ToShortDateString(), MaxTemp = 30, MinTemp = 23, Precipitation = 10.0, Weather = "🌧️ Rain" },
+            new WeatherForecast { Date = today.AddDays(3).ToShortDateString(), MaxTemp = 32, MinTemp = 26, Precipitation = 3.0, Weather = "⛈️ Showers" },
+            new WeatherForecast { Date = today.AddDays(4).ToShortDateString(), MaxTemp = 33, MinTemp = 27, Precipitation = 1.0, Weather = "☁️ Overcast" }
+        };
     }
 
     private class WeatherForecast
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public string Date { get; set; } = "";
+        public double MaxTemp { get; set; }
+        public double MinTemp { get; set; }
+        public double Precipitation { get; set; }
+        public string Weather { get; set; } = "";
     }
 }
+
+
+

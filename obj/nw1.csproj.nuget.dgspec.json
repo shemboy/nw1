@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj": {}
+    "C:\\Users\\shemd\\Downloads\\Compressed\\nw1-main\\nw1-main\\nw1.csproj": {}
   },
   "projects": {
-    "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj": {
+    "C:\\Users\\shemd\\Downloads\\Compressed\\nw1-main\\nw1-main\\nw1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj",
+        "projectUniqueName": "C:\\Users\\shemd\\Downloads\\Compressed\\nw1-main\\nw1-main\\nw1.csproj",
         "projectName": "nw1",
-        "projectPath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj",
+        "projectPath": "C:\\Users\\shemd\\Downloads\\Compressed\\nw1-main\\nw1-main\\nw1.csproj",
         "packagesPath": "C:\\Users\\shemd\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\obj\\",
+        "outputPath": "C:\\Users\\shemd\\Downloads\\Compressed\\nw1-main\\nw1-main\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\shemd\\AppData\\Roaming\\NuGet\\NuGet.Config"

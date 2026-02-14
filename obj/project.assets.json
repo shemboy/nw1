@@ -50,9 +50,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj",
-      "projectName": "nw1",
-      "projectPath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\nw1.csproj",
+      "projectUniqueName": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\BSIT2B.csproj",
+      "projectName": "BSIT2B",
+      "projectPath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\BSIT2B.csproj",
       "packagesPath": "C:\\Users\\shemd\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\shemd\\OneDrive\\Documents\\shem\\1\\nw1\\obj\\",
       "projectStyle": "PackageReference",
